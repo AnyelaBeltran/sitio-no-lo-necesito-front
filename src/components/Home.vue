@@ -5,7 +5,7 @@
       <img src="../assets/images/fondo-home.png" alt="Banner de diversión" class="banner-img">
       <div class="banner-card">
         <!-- Contenido de la tarjeta de alerta en el banner -->
-        <div class="alert-info">
+        <div class="alert-info" v-if="!user">
           <h2>Porfavor! Inicie sesión para poder comprar en la tienda</h2>
         </div>
       </div>
@@ -31,7 +31,7 @@
           <!-- Tarjeta  -->
           <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-6" v-for="(consola, index) in consolas">
             <div class="card juego-card">
-              <img src="imagen_juego_1.jpg" alt="Juego 1">
+              <img width="20px" class="card-img-top img-fluid mb-3" :src="'../../../../public/' + consola.imagen_path" alt="Imagen">
               <div class="card-body">
                 <h5 class="card-title">{{ consola.nombre }}</h5>
                 <p class="card-text">{{ consola.descripcion }}</p>
@@ -50,8 +50,6 @@
           </div>
 
 
-
-
         </div>
       </div>
 
@@ -64,7 +62,7 @@
           <!-- Tarjeta 1 -->
           <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-6" v-for="(juego, index) in videoJuegos">
             <div class="card juego-card">
-              <img src="imagen_juego_1.jpg" alt="Juego 1">
+              <img width="20px" class="card-img-top img-fluid mb-3" :src="'../../../../public/' + juego.imagen_path" alt="Imagen">
               <div class="card-body">
                 <h5 class="card-title">{{ juego.nombre }}</h5>
                 <p class="card-text">{{ juego.descripcion }}.</p>
@@ -78,7 +76,7 @@
                 </div>
                 <h3>Precio: <span class="badge bg-primary">${{ juego.precio }}</span></h3>
 
-                <button type="button" class="btn btn-danger">
+                <button type="button" class="btn btn-danger" @click="comprarJuegos(index + 1)">
                   <i class="fa fa-shopping-cart" aria-hidden="true" style="font-size:40px;"></i>
 
                   !Comprar Ahora! <span class="badge text-bg-secondary">{{ juego.stock }} Únidades disponibles</span>
@@ -103,11 +101,20 @@ import Swal from 'sweetalert2';
 
 export default {
   name: "Home",
+  props: {
+    user : Object
+
+  },
+ 
+  
+
+
   data() {
     return {
       consolas: [],
       videoJuegos: [],
       token: localStorage.getItem("token"),
+     
 
 
     };
@@ -115,9 +122,31 @@ export default {
 
   methods: {
     comprarConsolas(index) {
-      console.log(index);
 
-      if (!this.token) {
+      if (!this.user) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Debes iniciar sesión para poder comprar en la tienda',
+
+        })
+        this.$router.push('/login');
+
+
+
+      }
+      else {
+        Swal.fire({
+          icon: 'success',
+          title: '!Consola agregada al carrito!',
+          text: 'Gracias por tu selección',
+        })
+      }
+
+    },
+
+    comprarJuegos(index) {
+      if (!this.user) {
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -133,16 +162,18 @@ export default {
         Swal.fire({
           icon: 'success',
           title: '¡Juego agregado al carrito!',
-          text: 'Gracias por tu compra'
+          text: 'Gracias por tu selección',
         })
       }
 
-    },
+    
+    }
 
   },
 
 
-  async mounted() {
+
+  async created() {
     try {
       const products = await axios.get("/get-last-in-stock");
       const data = products.data;
@@ -150,11 +181,16 @@ export default {
       this.consolas = data.data.consolas;
       this.videoJuegos = data.data.videojuegos
 
-
+      
     } catch (error) {
 
     }
-  }
+  },
+
+
+  
+
+
 
 };
 </script>

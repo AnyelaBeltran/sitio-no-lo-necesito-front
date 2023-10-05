@@ -64,7 +64,6 @@ import Swal from "sweetalert2";
 
 export default {
   name: "Login",
-
   data() {
     return {
       email: "",
@@ -77,49 +76,46 @@ export default {
     async handleSubmit() {
       try {
         const response = await axios.post("/login", {
-        email: this.email,
-        password: this.password,
-      });
+          email: this.email,
+          password: this.password,
+        });
 
-      const data = response.data;
-      console.log(data);
+        const data = response.data;
 
-      if (data.code == 201) {
+        if (data.code == 201) {
+          this.token = data.result.token;
+          localStorage.setItem("token", this.token);
 
-        
-        this.token = data.result.token
-        localStorage.setItem("token", this.token);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Bievenido',
-          text: data.result.userData.nombre + ' ' + data.result.userData.nombre
-        })
-
-        this.$router.push('/');
-
-      }
-      
-
-      this.token = response.data.result.token;
+          Swal.fire({
+            icon: 'success',
+            title: 'Bienvenido ' + data.result.userData.nombre + ' ' + data.result.userData.apellido,
+              
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          }).then(() => {
+            this.$router.push('/');
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
+          });
+        }
       } catch (error) {
-        console.log(error);
-        if(error.response.data.code == 422) {
+        if (error.response.data.code == 422 || error.response.data.code == 404) {
           Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: error.response.data.messages
-          })
+          });
         }
-        
       }
     },
   },
 };
 </script>
 
+
 <style scoped>
-/* Estilos específicos para esta página */
 .background-image {
   background-image: url("../assets/images/fondo-login.jpeg");
   background-size: cover;
@@ -140,8 +136,8 @@ export default {
   border: none;
   border-radius: 25px;
   width: 100%;
-  /* Elimina la propiedad max-width para permitir que la tarjeta se expanda */
 }
 
-/* Ajustar los estilos según sea necesario */
+/* Estilos para ajustar el tamaño del spinner */
+
 </style>
