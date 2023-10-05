@@ -16,20 +16,40 @@
               Tienda
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Video Juegos</a></li>
-              <li><a class="dropdown-item" href="#">Consolas</a></li>
+              <router-link class="dropdown-item" to="/tienda/consolas">Consolas</router-link>
+              <router-link class="dropdown-item" to="/tienda/videojuegos">VideoJuegos</router-link>
+              
+            </ul>
+          </li>
+
+
+
+          <li class="nav-item dropdown" v-if="rol === 2 && user">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-user" aria-hidden="true"></i>
+              Dashboard - Administrador
+            </a>
+            <ul class="dropdown-menu">
+              <router-link class="dropdown-item" to="/dashboard/consolas">Consolas</router-link>
+              <router-link class="dropdown-item" to="/dashboard/juegos">VideoJuegos</router-link>
+              <router-link class="dropdown-item" to="/dashboard/category-games">Categorías de juegos</router-link>
+
+
+
               <li>
                 <hr class="dropdown-divider" />
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Administrador</a>
-          </li>
+
+
+
+
         </ul>
         <div class="btn-group" role="group">
           <router-link class="btn btn-outline-primary" to="/register">Registro</router-link>
-          <router-link class="btn btn-outline-secondary" to="/login">Inicio de Sesión</router-link>
+          <router-link v-if="!user" class="btn btn-outline-secondary" to="/login">Inicio de Sesión</router-link>
+          <a v-if="user" href="javascript:void(0)" @click="logout" class="btn btn-outline-danger">Cerrar Sesión</a>
         </div>
 
         <!-- Agrega nombre, correo electrónico y estado "en línea" aquí -->
@@ -46,21 +66,37 @@
 <script>
 export default {
   name: "Nav",
-
-  props: ["user"],
+  props: {
+    user: Object, // Define user como una prop de tipo Object
+  },
+ 
 
   data() {
     return {
-      user: null,
-      token: null
+      rol: null,
+
+
     }
   },
 
-  mounted() {
-    
-    console.log(user);
-    
+  methods: {
+    logout() {
+      // Emitir un evento para que el padre realice el logout
+      localStorage.removeItem("token");
+     
+      this.$emit("logout");
+    },
+  },
+
+  created() {
+    if (this.user) {
+    this.rol = this.user.rol_id;
+    console.log(this.rol, 'rol');
   }
+  },
+
+
+
 };
 </script>
 
@@ -87,4 +123,5 @@ export default {
   100% {
     transform: rotate(360deg);
   }
-}</style>
+}
+</style>
