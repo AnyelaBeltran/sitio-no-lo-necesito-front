@@ -47,7 +47,7 @@
 
 
         <div class="text-center mt-3">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" @click="cancelar"  class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Consola</button>
         </div>
       </form>
@@ -127,7 +127,9 @@ export default {
 
 
   methods: {
-
+    cancelar(){
+      this.$router.push('/dashboard/consolas');
+    },
 
 
 
